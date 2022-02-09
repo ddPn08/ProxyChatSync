@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Waterfall" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/.debug/waterfall/waterfall.jar" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.debug/waterfall" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="false" tasks="preDebug" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>
