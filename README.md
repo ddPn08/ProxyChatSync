@@ -28,3 +28,11 @@ discord:
   # ID of channels to sync
   channelId: '000000000000000000'
 ```
+
+# その他機能
+- SuperVanish連携 (Cooperation with SuperVanish)
+  - 隠れる際のメッセージを最適化。(Optimized message when hiding.)
+- LuckPerms連携 (Cooperation with LuckPerms)
+  - LuckPermsのprefixとsuffixを反映します。(Applies prefix and suffix of LuckPerms.)
+- LunaChat連携
+  - チャットの自動日本語変換を行います。
