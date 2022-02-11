@@ -19,6 +19,7 @@ java {
 }
 
 dependencies {
+    implementation(project(":common"))
     implementation(project(":paper"))
     implementation(project(":waterfall"))
     implementation(project(":velocity"))
@@ -28,11 +29,10 @@ tasks {
     shadowJar{
         archiveFileName.set(artifactName)
     }
-
     register("preDebug"){
         dependsOn("clean", "shadowJar")
         doLast {
-            listOf("paper", "waterfall", "velocity").forEach {
+            listOf("paper", "paper2", "waterfall", "velocity").forEach {
                 copy {
                     from("$buildDir/libs/${artifactName}")
                     into(".debug/$it/plugins")
@@ -48,9 +48,7 @@ subprojects {
     description = parent!!.description
 
     apply {
-        plugin("java")
         plugin("org.jetbrains.kotlin.jvm")
-        plugin("com.github.johnrengelman.shadow")
         plugin("org.jetbrains.gradle.plugin.idea-ext")
     }
 
@@ -60,6 +58,10 @@ subprojects {
     }
 
     dependencies {
+        if(project.name != "common") {
+            implementation(project(":common"))
+        }
+        implementation("com.google.code.gson:gson:2.8.9")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
     }
 

@@ -1,0 +1,4 @@
+discord:
+  enable: false
+  token: ''
+  channelId: '000000000000000000'

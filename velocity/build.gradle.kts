@@ -14,6 +14,10 @@ repositories {
 dependencies{
     compileOnly("com.velocitypowered:velocity-api:3.0.1")
     kapt("com.velocitypowered:velocity-api:3.1.0")
+
+    compileOnly("net.dv8tion:JDA:5.0.0-alpha.5") {
+        exclude(module = "opus-java")
+    }
 }
 
 tasks.build {
@@ -35,6 +39,6 @@ val generateTemplates = tasks.register<Copy>("generateTemplates") {
     into(layout.buildDirectory.dir("generated/source/templates"))
     expand(props)
 }
-
+kapt.includeCompileClasspath = false
 kotlin.sourceSets["main"].kotlin.srcDir(generateTemplates.map{ it.outputs })
 rootProject.idea.project.settings.taskTriggers.afterSync(generateTemplates)

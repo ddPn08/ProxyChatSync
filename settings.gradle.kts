@@ -1,2 +1,2 @@
-rootProject.name = "template"
-include("paper", "waterfall", "velocity")
+rootProject.name = "ProxyChatSync"
+include("common","paper", "waterfall", "velocity")

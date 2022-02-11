@@ -1,4 +1,4 @@
-package run.dn5.template
+package run.dn5.proxychatsync
 
 import net.md_5.bungee.api.plugin.Plugin
 

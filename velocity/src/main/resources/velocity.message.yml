@@ -1,0 +1,11 @@
+ProxyJoin: '&e${player} がサーバーに参加しました。'
+Disconnect: '&e${player} がサーバーから退出しました。'
+
+Discord_ServerStart: ':white_check_mark: **サーバーが起動しました**'
+Discord_ServerStop: ':octagonal_sign: **サーバーが停止しました**'
+Discord_FromServer: '(${server}) ${author} > ${message}'
+Discord_FromServerWithJapanese: '(${server}) ${author} > ${message} (${japanized})'
+Discord_FromDiscord: '[ &bDISCORD &r] ${author} &r> ${message}'
+Discord_ServerSwitch: '${player} が ${server} に参加しました。'
+Discord_ProxyJoin: '${player} がサーバーに参加しました。'
+Discord_Disconnect: '${player} がサーバーから退出しました。'

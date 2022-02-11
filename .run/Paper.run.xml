@@ -2,10 +2,8 @@
   <configuration default="false" name="Paper" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/.debug/paper/paper.jar" />
     <option name="PROGRAM_PARAMETERS" value="nogui" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.debug/paper" />
+    <option name="WORKING_DIRECTORY" value="E:\data\code\java\minecraft\ProxyChatSync\.debug\paper" />
     <option name="ALTERNATIVE_JRE_PATH" />
-    <method v="2">
-      <option name="Gradle.BeforeRunTask" enabled="true" tasks="preDebug" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

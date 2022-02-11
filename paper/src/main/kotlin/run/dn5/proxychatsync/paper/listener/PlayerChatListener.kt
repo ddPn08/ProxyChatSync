@@ -1,0 +1,34 @@
+package run.dn5.proxychatsync.paper.listener
+
+import com.github.ucchyocean.lc3.japanize.JapanizeType
+import com.google.common.io.ByteStreams
+import com.google.gson.Gson
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerChatEvent
+import run.dn5.proxychatsync.Constants
+import run.dn5.proxychatsync.PaperPlugin
+import run.dn5.proxychatsync.model.ChatSyncData
+
+class PlayerChatListener(
+    private val plugin: PaperPlugin
+): Listener {
+    @EventHandler
+    fun onPlayerChat(e: AsyncPlayerChatEvent){
+        val player = e.player
+        val out = ByteStreams.newDataOutput()
+
+        val data = ChatSyncData(
+            player.uniqueId.toString(),
+            player.name,
+            e.message
+        )
+
+        if(this.plugin.useLunaChat)
+            data.japanized = this.plugin.lunaChatAPI?.japanize(e.message, JapanizeType.GOOGLE_IME)
+
+        out.writeUTF(Constants.SUB_S_TO_P.CHAT_SYNC.channel)
+        out.writeUTF(Gson().toJson(data))
+        player.sendPluginMessage(this.plugin, Constants.CHANNEL_FULL, out.toByteArray())
+    }
+}
