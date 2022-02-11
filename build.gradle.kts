@@ -5,8 +5,8 @@ plugins {
 }
 
 group = "run.dn5"
-version = "1.0"
-description = "テンプレート"
+version = "0.1-beta"
+description = "Synchronize chats between servers under Velocity, BungeeCord."
 val artifactName =  "${rootProject.name}-${rootProject.version}.jar"
 
 repositories {

@@ -8,8 +8,6 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
-import ninja.leaping.configurate.ConfigurationNode
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader
 import org.slf4j.Logger
 import run.dn5.proxychatsync.velocity.Messenger
 import run.dn5.proxychatsync.velocity.discord.listener.MessageListener
@@ -23,6 +21,7 @@ import java.nio.file.Path
 @Plugin(
     id = BuildConstants.ID,
     name = BuildConstants.NAME,
+    description = BuildConstants.DESCRIPTION,
     version = BuildConstants.VERSION,
     authors = [BuildConstants.AUTHOR]
 )
