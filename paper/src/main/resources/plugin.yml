@@ -4,4 +4,3 @@ version: ${version}
 description: ${description}
 main: ${group}.${id}.PaperPlugin
 softdepend: [LunaChat,LuckPerms,SuperVanish]
-api-version: 1.18

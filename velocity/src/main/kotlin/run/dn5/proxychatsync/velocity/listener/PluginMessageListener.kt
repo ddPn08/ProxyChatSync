@@ -22,10 +22,7 @@ class PluginMessageListener(
         val sub = input.readUTF()
         val connection = e.source as ServerConnection
 
-        this.plugin.logger.info(sub)
-
         when (sub){
-
             Constants.SUB_S_TO_P.CHAT_SYNC.channel -> this.chatSync(input, connection)
             Constants.SUB_S_TO_P.PLAYER_JOIN.channel -> this.playerJoin(input, connection)
             Constants.SUB_S_TO_P.VANISH_PLAYER_HIDE.channel -> this.vanishPlayerHide(input, connection)
@@ -42,7 +39,7 @@ class PluginMessageListener(
         val out = ByteStreams.newDataOutput()
         out.writeUTF(Constants.SUB_P_TO_S.CHAT_SYNC.channel)
         out.writeUTF(gson.toJson(syncData))
-        this.plugin.proxy.allServers.forEach {
+        this.plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() && it.serverInfo != connection.serverInfo }.forEach {
             it.sendPluginMessage(MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME), out.toByteArray())
         }
 
@@ -56,9 +53,8 @@ class PluginMessageListener(
         out.writeUTF(Constants.SUB_P_TO_S.SERVER_SWITCH.channel)
         out.writeUTF(Gson().toJson(ServerSwitchData(player.uniqueId.toString(), player.username, connection.serverInfo.name)))
 
-        for (s in this.plugin.proxy.allServers) {
-            if(s.playersConnected.isEmpty()) continue
-            s.sendPluginMessage(MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME), out.toByteArray())
+        this.plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() }.forEach {
+            it.sendPluginMessage(MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME), out.toByteArray())
         }
 
         this.plugin.messenger.onServerSwitch(player, connection.serverInfo.name)
@@ -76,9 +72,8 @@ class PluginMessageListener(
         out.writeUTF(Constants.SUB_P_TO_S.SERVER_SWITCH.channel)
         out.writeUTF(Gson().toJson(ServerSwitchData(player.uniqueId.toString(), player.username, connection.serverInfo.name)))
 
-        for (s in this.plugin.proxy.allServers) {
-            if(s.playersConnected.isEmpty()) continue
-            s.sendPluginMessage(MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME), out.toByteArray())
+        this.plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() }.forEach {
+            it.sendPluginMessage(MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME), out.toByteArray())
         }
     }
 
