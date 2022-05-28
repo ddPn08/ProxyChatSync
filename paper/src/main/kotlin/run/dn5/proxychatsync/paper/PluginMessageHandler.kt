@@ -31,6 +31,8 @@ class PluginMessageHandler(
         val gson = GsonBuilder().serializeNulls().create()
         val data = input.readUTF()
         val syncData = gson.fromJson(data, ChatSyncData::class.java)
+        if(Bukkit.getPlayer(UUID.fromString(syncData.uuid)) != null) return
+
         var msg = this.plugin.getMessage().getString("Chat") ?: "<\${prefix}\${author}&r\${suffix}> \${message} &b(\${japanized}) &7@\${server}"
 
         if(this.plugin.useLuckPerms){
@@ -50,6 +52,7 @@ class PluginMessageHandler(
             .replace("\${message}", syncData.message ?: "")
             .replace("\${japanized}", syncData.japanized ?: "")
             .replace("\${server}", syncData.server ?: "")
+            .replace("<br>", "\n")
 
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', msg))
     }
@@ -60,6 +63,7 @@ class PluginMessageHandler(
         msg = msg
             .replace("\${player}", switchData.username)
             .replace("\${server}", switchData.from)
+            .replace("<br>", "\n")
 
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', msg))
     }

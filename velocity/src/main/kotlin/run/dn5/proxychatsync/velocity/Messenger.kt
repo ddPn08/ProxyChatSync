@@ -18,7 +18,10 @@ class Messenger(
         return YAMLConfigurationLoader.builder().setFile(File("${this.plugin.dataFolder}/message.yml")).build().load()
     }
     private fun getMessage(key: String): String? {
-        return this.getMessage().getNode(key).string
+        return this.getMessage().getNode(key).string?.replace("<br>", "\n")
+    }
+    private fun broadcast(msg: String) {
+        this.plugin.proxy.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(msg))
     }
 
     fun onStart(){
@@ -35,7 +38,7 @@ class Messenger(
     fun onDisconnected(player: Player){
         val msg = (this.getMessage("Disconnect") ?: "&e\${player} がサーバーから退出しました。")
             .replace("\${player}", player.username)
-        this.plugin.proxy.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(msg))
+        this.broadcast(msg)
 
         if(this.plugin.common.discordChatSync.enabled){
             val discordMsg = (this.getMessage("Discord_Disconnect") ?: "\${player} がサーバーから退出しました。")
@@ -43,10 +46,11 @@ class Messenger(
             this.plugin.common.discordChatSync.userAction(discordMsg, player.uniqueId, Color.RED)
         }
     }
+
     fun onLogin(player: Player){
         val msg = (this.getMessage("ProxyJoin") ?: "&e\${player} がサーバーに参加しました。")
             .replace("\${player}", player.username)
-        this.plugin.proxy.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(msg))
+        this.broadcast(msg)
 
         if(this.plugin.common.discordChatSync.enabled){
             val discordMsg = (this.getMessage("Discord_ProxyJoin") ?: "\${player} がサーバーに参加しました。")
@@ -54,6 +58,7 @@ class Messenger(
             this.plugin.common.discordChatSync.userAction(discordMsg, player.uniqueId, Color.GREEN)
         }
     }
+
     fun onServerSwitch(player: Player, server: String){
         if(this.plugin.common.discordChatSync.enabled){
             val discordMsg = (this.getMessage("Discord_ServerSwitch") ?: "\${player} が \${server} に参加しました。")
