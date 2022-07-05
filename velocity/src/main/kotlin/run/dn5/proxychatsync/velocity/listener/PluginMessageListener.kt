@@ -24,9 +24,9 @@ class PluginMessageListener(
 
         when (sub){
             Constants.SUB_S_TO_P.CHAT_SYNC.channel -> this.chatSync(input, connection)
-            Constants.SUB_S_TO_P.PLAYER_JOIN.channel -> this.playerJoin(input, connection)
-            Constants.SUB_S_TO_P.VANISH_PLAYER_HIDE.channel -> this.vanishPlayerHide(input, connection)
-            Constants.SUB_S_TO_P.VANISH_PLAYER_SHOW.channel -> this.vanishPlayerShow(input, connection)
+            Constants.SUB_S_TO_P.PLAYER_JOIN.channel -> this.playerJoin(connection)
+            Constants.SUB_S_TO_P.VANISH_PLAYER_HIDE.channel -> this.vanishPlayerHide(connection)
+            Constants.SUB_S_TO_P.VANISH_PLAYER_SHOW.channel -> this.vanishPlayerShow(connection)
         }
     }
 
@@ -46,7 +46,7 @@ class PluginMessageListener(
         this.plugin.messenger.chatToDiscord(syncData)
     }
 
-    private fun playerJoin(input: ByteArrayDataInput, connection: ServerConnection){
+    private fun playerJoin(connection: ServerConnection){
         val player = connection.player
 
         val out = ByteStreams.newDataOutput()
@@ -60,11 +60,11 @@ class PluginMessageListener(
         this.plugin.messenger.onServerSwitch(player, connection.serverInfo.name)
     }
 
-    private fun vanishPlayerHide(input: ByteArrayDataInput, connection: ServerConnection){
+    private fun vanishPlayerHide(connection: ServerConnection){
         this.plugin.messenger.onDisconnected(connection.player)
     }
 
-    private fun vanishPlayerShow(input: ByteArrayDataInput, connection: ServerConnection){
+    private fun vanishPlayerShow(connection: ServerConnection){
         val player = connection.player
         this.plugin.messenger.onLogin(player)
 
