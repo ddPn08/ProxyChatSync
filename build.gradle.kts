@@ -61,8 +61,8 @@ subprojects {
         if(project.name != "common") {
             implementation(project(":common"))
         }
-        implementation("com.google.code.gson:gson:2.8.9")
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
+        implementation("com.google.code.gson:gson:2.9.0")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.7.0")
     }
 
     java {

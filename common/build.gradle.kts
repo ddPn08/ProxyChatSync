@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies{
-    compileOnly("net.kyori:adventure-api:4.9.3")
-    implementation("com.charleskorn.kaml:kaml:0.40.0")
+    compileOnly("net.kyori:adventure-api:4.11.0")
+    implementation("com.charleskorn.kaml:kaml:0.45.0")
     implementation("net.dv8tion:JDA:5.0.0-alpha.5")
 }
