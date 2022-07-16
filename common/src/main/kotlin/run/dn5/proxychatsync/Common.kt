@@ -12,16 +12,16 @@ class Common(
     val discordChatSync: DiscordChatSync = DiscordChatSync(this)
 
     init {
-        this.checkResources()
-        if (this.isProxy && this.getConfig().discord.enable) this.discordChatSync.enable(this.getConfig().discord.token)
+        checkResources()
+        if (isProxy && getConfig().discord.enable) discordChatSync.enable(getConfig().discord.token)
     }
 
     private fun checkResources() {
-        if (!this.dataFolder.exists()) this.dataFolder.mkdirs()
-        if(this.isProxy){
-            val configFile = File("${this.dataFolder}/config.yml")
+        if (!dataFolder.exists()) dataFolder.mkdirs()
+        if(isProxy){
+            val configFile = File("${dataFolder}/config.yml")
             if (!configFile.exists()) {
-                this.javaClass.getResourceAsStream("/config.yml").use {
+                javaClass.getResourceAsStream("/config.yml").use {
                     if (it == null) return
                     Files.copy(it, configFile.toPath())
                 }
@@ -32,7 +32,7 @@ class Common(
     fun getConfig(): Configuration {
         return Yaml.default.decodeFromStream(
             Configuration.serializer(),
-            File("${this.dataFolder}/config.yml").inputStream()
+            File("${dataFolder}/config.yml").inputStream()
         )
     }
 }

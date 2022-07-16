@@ -23,16 +23,16 @@ class PaperPlugin : JavaPlugin() {
     var useSuperVanish = false
 
     override fun onEnable() {
-        this.checkResources()
-        this.checkDepends()
-        this.registerListeners()
-        this.server.messenger.registerIncomingPluginChannel(
+        checkResources()
+        checkDepends()
+        registerListeners()
+        server.messenger.registerIncomingPluginChannel(
             this,
             Constants.CHANNEL_FULL,
             PluginMessageHandler(this)
         );
-        this.server.messenger.registerOutgoingPluginChannel(this, Constants.CHANNEL_FULL);
-        this.logger.info("Enabled")
+        server.messenger.registerOutgoingPluginChannel(this, Constants.CHANNEL_FULL);
+        logger.info("Enabled")
     }
 
     private fun registerListeners() {
@@ -41,33 +41,33 @@ class PaperPlugin : JavaPlugin() {
             PlayerJoinListener(this),
             PlayerQuitListener()
         )
-        if (this.useSuperVanish) listeners.add(PlayerVanishStateChangeListener(this))
-        listeners.forEach { this.server.pluginManager.registerEvents(it, this) }
+        if (useSuperVanish) listeners.add(PlayerVanishStateChangeListener(this))
+        listeners.forEach { server.pluginManager.registerEvents(it, this) }
     }
 
     private fun checkDepends() {
-        if (this.server.pluginManager.isPluginEnabled("LunaChat")) {
-            this.useLunaChat = true
-            this.lunaChatAPI = (this.server.pluginManager.getPlugin("LunaChat") as LunaChatBukkit).lunaChatAPI
+        if (server.pluginManager.isPluginEnabled("LunaChat")) {
+            useLunaChat = true
+            lunaChatAPI = (server.pluginManager.getPlugin("LunaChat") as LunaChatBukkit).lunaChatAPI
         }
-        if (this.server.pluginManager.isPluginEnabled("LuckPerms")) {
-            this.useLuckPerms = true
+        if (server.pluginManager.isPluginEnabled("LuckPerms")) {
+            useLuckPerms = true
         }
-        if (this.server.pluginManager.isPluginEnabled("SuperVanish")) {
-            this.useSuperVanish = true
+        if (server.pluginManager.isPluginEnabled("SuperVanish")) {
+            useSuperVanish = true
         }
     }
 
     private fun checkResources() {
-        if (!this.dataFolder.exists()) this.dataFolder.mkdir()
-        val file = File("${this.dataFolder}/message.yml")
-        if (!file.exists()) this.getResource("bukkit.message.yml").use {
+        if (!dataFolder.exists()) dataFolder.mkdir()
+        val file = File("${dataFolder}/message.yml")
+        if (!file.exists()) getResource("bukkit.message.yml").use {
             if(it == null) return
             Files.copy(it, file.toPath())
         }
     }
 
     fun getMessage(): YamlConfiguration {
-        return YamlConfiguration.loadConfiguration(File("${this.dataFolder}/message.yml"))
+        return YamlConfiguration.loadConfiguration(File("${dataFolder}/message.yml"))
     }
 }

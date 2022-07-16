@@ -22,8 +22,8 @@ class PluginMessageHandler(
         val input = ByteStreams.newDataInput(message)
 
         when (input.readUTF()){
-            Constants.SUB_P_TO_S.CHAT_SYNC.channel -> this.chatSync(input)
-            Constants.SUB_P_TO_S.SERVER_SWITCH.channel -> this.serverSwitch(input)
+            Constants.SUB_P_TO_S.CHAT_SYNC.channel -> chatSync(input)
+            Constants.SUB_P_TO_S.SERVER_SWITCH.channel -> serverSwitch(input)
         }
     }
 
@@ -33,9 +33,9 @@ class PluginMessageHandler(
         val syncData = gson.fromJson(data, ChatSyncData::class.java)
         if(Bukkit.getPlayer(UUID.fromString(syncData.uuid)) != null) return
 
-        var msg = this.plugin.getMessage().getString("Chat") ?: "<\${prefix}\${author}&r\${suffix}> \${message} &b(\${japanized}) &7@\${server}"
+        var msg = plugin.getMessage().getString("Chat") ?: "<\${prefix}\${author}&r\${suffix}> \${message} &b(\${japanized}) &7@\${server}"
 
-        if(this.plugin.useLuckPerms){
+        if(plugin.useLuckPerms){
             val lp = LuckPermsProvider.get()
             val user = lp.userManager.loadUser(UUID.fromString(syncData.uuid)).join()
             if(user != null){
@@ -58,7 +58,7 @@ class PluginMessageHandler(
     }
     private fun serverSwitch(input: ByteArrayDataInput){
         val switchData = GsonBuilder().serializeNulls().create().fromJson(input.readUTF(), ServerSwitchData::class.java)
-        var msg = this.plugin.getMessage().getString("ServerJoin") ?: "&6\${player} が &b\${server} &6に参加しました。"
+        var msg = plugin.getMessage().getString("ServerJoin") ?: "&6\${player} が &b\${server} &6に参加しました。"
 
         msg = msg
             .replace("\${player}", switchData.username)

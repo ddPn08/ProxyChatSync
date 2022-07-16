@@ -21,6 +21,6 @@ class PlayerVanishStateChangeListener(
             out.writeUTF(Constants.SUB_S_TO_P.VANISH_PLAYER_SHOW.channel)
         }
         out.writeUTF(e.uuid.toString())
-        player.sendPluginMessage(this.plugin, Constants.CHANNEL_FULL, out.toByteArray())
+        player.sendPluginMessage(plugin, Constants.CHANNEL_FULL, out.toByteArray())
     }
 }

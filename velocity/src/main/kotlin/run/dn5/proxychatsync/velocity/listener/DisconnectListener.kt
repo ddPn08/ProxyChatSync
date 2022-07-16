@@ -9,6 +9,6 @@ class DisconnectListener(
 ) {
     @Subscribe
     fun onDisconnect(e: DisconnectEvent) {
-        this.plugin.messenger.onDisconnected(e.player)
+        plugin.messenger.onDisconnected(e.player)
     }
 }

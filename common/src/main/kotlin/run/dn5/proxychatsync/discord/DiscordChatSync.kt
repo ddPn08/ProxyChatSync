@@ -20,50 +20,50 @@ class DiscordChatSync(
     private var jda: JDA? = null
 
     fun enable(token: String){
-        this.jda = JDABuilder.createDefault(token).build()
-        this.jda!!.awaitReady()
-        this.enabled = true
+        jda = JDABuilder.createDefault(token).build()
+        jda!!.awaitReady()
+        enabled = true
     }
 
     fun disable(){
-        if(!this.enabled) throw Exception("DiscordChatSync is not enabled")
-        this.enabled = false
+        if(!enabled) throw Exception("DiscordChatSync is not enabled")
+        enabled = false
         jda!!.cancelRequests()
         jda!!.shutdownNow()
     }
 
     fun registerEvents(listener: ListenerAdapter){
-        this.getClient().addEventListener(listener)
+        getClient().addEventListener(listener)
     }
 
     private fun getClient(): JDA {
-        if(this.jda == null) throw Exception("Discord client not enabled")
-        return this.jda!!
+        if(jda == null) throw Exception("Discord client not enabled")
+        return jda!!
     }
 
     fun getOwn(): User {
-        return this.getClient().selfUser
+        return getClient().selfUser
     }
-    fun sendMessage(message: String, channelId: String = this.common.getConfig().discord.channelId) {
-        val channel = this.getClient().getTextChannelById(channelId) ?: return
+    fun sendMessage(message: String, channelId: String = common.getConfig().discord.channelId) {
+        val channel = getClient().getTextChannelById(channelId) ?: return
         channel.sendMessage(message).queue()
     }
     fun userAction(message: String?, uuid: UUID, color: Color?) {
         val eb = EmbedBuilder()
-        val config = this.common.getConfig()
+        val config = common.getConfig()
         eb.setAuthor(message, null, "https://crafatar.com/avatars/${uuid}")
         eb.setColor(color)
         sendEmbed(eb.build(), config.discord.channelId)
     }
 
     fun getMessageAction(message: String): MessageAction? {
-        val config = this.common.getConfig()
-        val channel = this.getClient().getTextChannelById(config.discord.channelId) ?: return null
+        val config = common.getConfig()
+        val channel = getClient().getTextChannelById(config.discord.channelId) ?: return null
         return channel.sendMessage(message)
     }
 
     fun sendEmbed(embed: MessageEmbed, channelId: String) {
-        val channel = this.getClient().getTextChannelById(channelId) ?: return
+        val channel = getClient().getTextChannelById(channelId) ?: return
         channel.sendMessageEmbeds(embed).queue()
     }
 

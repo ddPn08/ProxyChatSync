@@ -17,9 +17,9 @@ class PlayerJoinListener(
     @EventHandler
     fun onPlayerJoin(e: PlayerJoinEvent){
         e.joinMessage = null
-        if(this.plugin.useSuperVanish && VanishAPI.isInvisible(e.player)) return
+        if(plugin.useSuperVanish && VanishAPI.isInvisible(e.player)) return
 
-        this.plugin.logger.info("${e.player.name} joined the server")
+        plugin.logger.info("${e.player.name} joined the server")
         val out = ByteStreams.newDataOutput()
         out.writeUTF(Constants.SUB_S_TO_P.PLAYER_JOIN.channel)
 
@@ -27,6 +27,6 @@ class PlayerJoinListener(
             override fun run() {
                 e.player.sendPluginMessage(plugin, Constants.CHANNEL_FULL, out.toByteArray())
             }
-        }.runTaskLater(this.plugin, 10)
+        }.runTaskLater(plugin, 10)
     }
 }

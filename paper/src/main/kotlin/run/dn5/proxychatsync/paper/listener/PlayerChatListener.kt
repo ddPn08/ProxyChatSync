@@ -24,11 +24,11 @@ class PlayerChatListener(
             e.message
         )
 
-        if(this.plugin.useLunaChat)
-            data.japanized = this.plugin.lunaChatAPI?.japanize(e.message, JapanizeType.GOOGLE_IME)
+        if(plugin.useLunaChat)
+            data.japanized = plugin.lunaChatAPI?.japanize(e.message, JapanizeType.GOOGLE_IME)
 
         out.writeUTF(Constants.SUB_S_TO_P.CHAT_SYNC.channel)
         out.writeUTF(Gson().toJson(data))
-        player.sendPluginMessage(this.plugin, Constants.CHANNEL_FULL, out.toByteArray())
+        player.sendPluginMessage(plugin, Constants.CHANNEL_FULL, out.toByteArray())
     }
 }

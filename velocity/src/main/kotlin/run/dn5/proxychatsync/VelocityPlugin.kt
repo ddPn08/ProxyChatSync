@@ -32,7 +32,7 @@ class VelocityPlugin @Inject constructor(
     val dataFolder: Path
 ) {
 
-    val common = Common(this.dataFolder.toFile(), true)
+    val common = Common(dataFolder.toFile(), true)
     val messenger = Messenger(this)
 
     companion object {
@@ -41,33 +41,33 @@ class VelocityPlugin @Inject constructor(
 
     init {
         instance = this
-        this.checkResources()
-        this.messenger.onStart()
-        if (this.common.discordChatSync.enabled) {
-            this.common.discordChatSync.registerEvents(MessageListener(this))
+        checkResources()
+        messenger.onStart()
+        if (common.discordChatSync.enabled) {
+            common.discordChatSync.registerEvents(MessageListener(this))
         }
     }
 
     @Subscribe
     fun onEnable(e: ProxyInitializeEvent) {
-        this.proxy.channelRegistrar.register(
+        proxy.channelRegistrar.register(
             MinecraftChannelIdentifier.create(
                 Constants.CHANNEL_ID,
                 Constants.CHANNEL_NAME
             )
         )
-        this.registerListeners()
+        registerListeners()
     }
 
     @Subscribe
     fun onDisable(e: ProxyShutdownEvent){
-        this.messenger.onStop()
+        messenger.onStop()
     }
 
     private fun checkResources() {
-        if (!this.dataFolder.toFile().exists()) this.dataFolder.toFile().mkdir()
-        val file = File("${this.dataFolder}/message.yml")
-        if (!file.exists()) this.javaClass.getResourceAsStream("/velocity.message.yml").use { input ->
+        if (!dataFolder.toFile().exists()) dataFolder.toFile().mkdir()
+        val file = File("${dataFolder}/message.yml")
+        if (!file.exists()) javaClass.getResourceAsStream("/velocity.message.yml").use { input ->
             if (input == null) return
             Files.copy(input, file.toPath())
         }
@@ -78,6 +78,6 @@ class VelocityPlugin @Inject constructor(
             PluginMessageListener(this),
             PostLoginListener(this),
             DisconnectListener(this)
-        ).forEach { this.proxy.eventManager.register(this, it) }
+        ).forEach { proxy.eventManager.register(this, it) }
     }
 }

@@ -8,10 +8,10 @@ class MessageListener(
     private val plugin: VelocityPlugin
 ): ListenerAdapter() {
     override fun onMessageReceived(e: MessageReceivedEvent) {
-        val config = this.plugin.common.getConfig()
+        val config = plugin.common.getConfig()
         if(e.channel.id != config.discord.channelId) return
         e.member ?: return
-        if(e.author == this.plugin.common.discordChatSync.getOwn()) return
-        this.plugin.messenger.chatFromDiscord(e.author, e.message)
+        if(e.author == plugin.common.discordChatSync.getOwn()) return
+        plugin.messenger.chatFromDiscord(e.author, e.message)
     }
 }

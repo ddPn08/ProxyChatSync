@@ -9,6 +9,6 @@ class PostLoginListener(
 ) {
     @Subscribe
     fun onPostLogin(e: PostLoginEvent){
-        this.plugin.messenger.onLogin(e.player)
+        plugin.messenger.onLogin(e.player)
     }
 }
