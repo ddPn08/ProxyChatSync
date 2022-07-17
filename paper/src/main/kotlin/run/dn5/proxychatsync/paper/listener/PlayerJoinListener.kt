@@ -2,11 +2,9 @@ package run.dn5.proxychatsync.paper.listener
 
 import com.google.common.io.ByteStreams
 import de.myzelyam.api.vanish.VanishAPI
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.scheduler.BukkitRunnable
 import run.dn5.proxychatsync.Constants
 import run.dn5.proxychatsync.PaperPlugin
@@ -21,7 +19,7 @@ class PlayerJoinListener(
 
         plugin.logger.info("${e.player.name} joined the server")
         val out = ByteStreams.newDataOutput()
-        out.writeUTF(Constants.SUB_S_TO_P.PLAYER_JOIN.channel)
+        out.writeUTF(Constants.SUBS2P.PLAYER_JOIN.channel)
 
         object: BukkitRunnable() {
             override fun run() {

@@ -12,3 +12,9 @@ discord:
   # 同期するチャンネルのID
   # ID of channels to sync
   channelId: '000000000000000000'
+  # 同期モード
+  # Sync mode
+  mode: 'bot' # "bot" or "webhook"
+  # スキンAPIのURL
+  # URL of SkinAPI
+  skinApiUrl: '"https://crafatar.com/avatars/${uuid}"'

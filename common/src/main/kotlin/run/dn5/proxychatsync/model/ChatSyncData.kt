@@ -1,15 +1,14 @@
 package run.dn5.proxychatsync.model
 
+data class ChatSyncData(
+    var uuid: String = "",
+    var username: String = "",
 
-class ChatSyncData(
-    var uuid: String? = null,
-    var username: String? = null,
+    var message: String = "",
+    var japanized: String = "",
 
-    var message: String? = null,
-    var japanized: String? = null,
+    var prefix: String = "",
+    var suffix: String = "",
 
-    var prefix: String? = null,
-    var suffix: String? = null,
-
-    var server: String? = null
+    var server: String = ""
 )

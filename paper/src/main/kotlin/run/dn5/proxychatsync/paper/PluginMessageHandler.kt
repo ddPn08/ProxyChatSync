@@ -16,47 +16,49 @@ import java.util.*
 
 class PluginMessageHandler(
     private val plugin: PaperPlugin
-): PluginMessageListener {
+) : PluginMessageListener {
     override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-        if(channel != Constants.CHANNEL_FULL) return
+        if (channel != Constants.CHANNEL_FULL) return
         val input = ByteStreams.newDataInput(message)
 
-        when (input.readUTF()){
-            Constants.SUB_P_TO_S.CHAT_SYNC.channel -> chatSync(input)
-            Constants.SUB_P_TO_S.SERVER_SWITCH.channel -> serverSwitch(input)
+        when (input.readUTF()) {
+            Constants.SUBP2S.CHAT_SYNC.channel -> chatSync(input)
+            Constants.SUBP2S.SERVER_SWITCH.channel -> serverSwitch(input)
         }
     }
 
-    private fun chatSync(input: ByteArrayDataInput){
+    private fun chatSync(input: ByteArrayDataInput) {
         val gson = GsonBuilder().serializeNulls().create()
         val data = input.readUTF()
         val syncData = gson.fromJson(data, ChatSyncData::class.java)
-        if(Bukkit.getPlayer(UUID.fromString(syncData.uuid)) != null) return
+        if (Bukkit.getPlayer(UUID.fromString(syncData.uuid)) != null) return
 
-        var msg = plugin.getMessage().getString("Chat") ?: "<\${prefix}\${author}&r\${suffix}> \${message} &b(\${japanized}) &7@\${server}"
+        var msg = plugin.getMessage().getString("Chat")
+            ?: "<\${prefix}\${author}&r\${suffix}> \${message} &b(\${japanized}) &7@\${server}"
 
-        if(plugin.useLuckPerms){
+        if (plugin.useLuckPerms) {
             val lp = LuckPermsProvider.get()
             val user = lp.userManager.loadUser(UUID.fromString(syncData.uuid)).join()
-            if(user != null){
+            if (user != null) {
                 val meta = user.cachedData.metaData
-                if(meta.prefix != null) syncData.prefix = meta.prefix
-                if(meta.suffix != null) syncData.suffix = meta.suffix
+                if (meta.prefix != null) syncData.prefix = meta.prefix!!
+                if (meta.suffix != null) syncData.suffix = meta.suffix!!
             }
         }
 
         msg = msg
-            .replace("\${author}", syncData.username ?: "Unknown")
-            .replace("\${prefix}", syncData.prefix ?: "")
-            .replace("\${suffix}", syncData.suffix ?: "")
-            .replace("\${message}", syncData.message ?: "")
-            .replace("\${japanized}", syncData.japanized ?: "")
-            .replace("\${server}", syncData.server ?: "")
+            .replace("\${author}", syncData.username.ifEmpty { "Unknown" })
+            .replace("\${prefix}", syncData.prefix)
+            .replace("\${suffix}", syncData.suffix)
+            .replace("\${message}", syncData.message)
+            .replace("\${japanized}", syncData.japanized)
+            .replace("\${server}", syncData.server)
             .replace("<br>", "\n")
 
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', msg))
     }
-    private fun serverSwitch(input: ByteArrayDataInput){
+
+    private fun serverSwitch(input: ByteArrayDataInput) {
         val switchData = GsonBuilder().serializeNulls().create().fromJson(input.readUTF(), ServerSwitchData::class.java)
         var msg = plugin.getMessage().getString("ServerJoin") ?: "&6\${player} が &b\${server} &6に参加しました。"
 

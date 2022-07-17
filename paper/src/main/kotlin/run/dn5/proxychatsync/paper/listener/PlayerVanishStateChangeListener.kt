@@ -16,9 +16,9 @@ class PlayerVanishStateChangeListener(
         val player = Bukkit.getPlayer(e.uuid) ?: return
         val out = ByteStreams.newDataOutput()
         if(e.isVanishing) {
-            out.writeUTF(Constants.SUB_S_TO_P.VANISH_PLAYER_HIDE.channel)
+            out.writeUTF(Constants.SUBS2P.VANISH_PLAYER_HIDE.channel)
         } else {
-            out.writeUTF(Constants.SUB_S_TO_P.VANISH_PLAYER_SHOW.channel)
+            out.writeUTF(Constants.SUBS2P.VANISH_PLAYER_SHOW.channel)
         }
         out.writeUTF(e.uuid.toString())
         player.sendPluginMessage(plugin, Constants.CHANNEL_FULL, out.toByteArray())

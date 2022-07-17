@@ -12,10 +12,10 @@ repositories {
 }
 
 dependencies{
-    compileOnly("com.velocitypowered:velocity-api:3.0.1")
     kapt("com.velocitypowered:velocity-api:3.1.0")
-
-    compileOnly("net.dv8tion:JDA:5.0.0-alpha.5") {
+    compileOnly("com.velocitypowered:velocity-api:3.0.1")
+    compileOnly("club.minnced:discord-webhooks:0.8.2")
+    compileOnly("net.dv8tion:JDA:5.0.0-alpha.13") {
         exclude(module = "opus-java")
     }
 }

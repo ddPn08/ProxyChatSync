@@ -11,7 +11,7 @@ class MessageListener(
         val config = plugin.common.getConfig()
         if(e.channel.id != config.discord.channelId) return
         e.member ?: return
-        if(e.author == plugin.common.discordChatSync.getOwn()) return
+        if(e.author == plugin.common.discordChatSync.jda.selfUser) return
         plugin.messenger.chatFromDiscord(e.author, e.message)
     }
 }

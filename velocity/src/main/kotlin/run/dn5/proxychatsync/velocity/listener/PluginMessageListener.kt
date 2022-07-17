@@ -23,10 +23,10 @@ class PluginMessageListener(
         val connection = e.source as ServerConnection
 
         when (sub) {
-            Constants.SUB_S_TO_P.CHAT_SYNC.channel -> chatSync(input, connection)
-            Constants.SUB_S_TO_P.PLAYER_JOIN.channel -> playerJoin(connection)
-            Constants.SUB_S_TO_P.VANISH_PLAYER_HIDE.channel -> vanishPlayerHide(connection)
-            Constants.SUB_S_TO_P.VANISH_PLAYER_SHOW.channel -> vanishPlayerShow(connection)
+            Constants.SUBS2P.CHAT_SYNC.channel -> chatSync(input, connection)
+            Constants.SUBS2P.PLAYER_JOIN.channel -> playerJoin(connection)
+            Constants.SUBS2P.VANISH_PLAYER_HIDE.channel -> vanishPlayerHide(connection)
+            Constants.SUBS2P.VANISH_PLAYER_SHOW.channel -> vanishPlayerShow(connection)
         }
     }
 
@@ -37,7 +37,7 @@ class PluginMessageListener(
         syncData.server = connection.serverInfo.name
 
         val out = ByteStreams.newDataOutput()
-        out.writeUTF(Constants.SUB_P_TO_S.CHAT_SYNC.channel)
+        out.writeUTF(Constants.SUBP2S.CHAT_SYNC.channel)
         out.writeUTF(gson.toJson(syncData))
         plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() && it.serverInfo != connection.serverInfo }
             .forEach {
@@ -54,7 +54,7 @@ class PluginMessageListener(
         val player = connection.player
 
         val out = ByteStreams.newDataOutput()
-        out.writeUTF(Constants.SUB_P_TO_S.SERVER_SWITCH.channel)
+        out.writeUTF(Constants.SUBP2S.SERVER_SWITCH.channel)
         out.writeUTF(
             Gson().toJson(
                 ServerSwitchData(

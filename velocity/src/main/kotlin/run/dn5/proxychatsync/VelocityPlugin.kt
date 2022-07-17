@@ -43,9 +43,6 @@ class VelocityPlugin @Inject constructor(
         instance = this
         checkResources()
         messenger.onStart()
-        if (common.discordChatSync.enabled) {
-            common.discordChatSync.registerEvents(MessageListener(this))
-        }
     }
 
     @Subscribe
@@ -56,11 +53,15 @@ class VelocityPlugin @Inject constructor(
                 Constants.CHANNEL_NAME
             )
         )
+        common.enable()
         registerListeners()
+
+        val ds = common.discordChatSync
+        if (ds.enabled) ds.registerEvents(MessageListener(this))
     }
 
     @Subscribe
-    fun onDisable(e: ProxyShutdownEvent){
+    fun onDisable(e: ProxyShutdownEvent) {
         messenger.onStop()
     }
 

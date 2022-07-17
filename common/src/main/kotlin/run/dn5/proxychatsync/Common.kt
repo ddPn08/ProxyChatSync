@@ -1,6 +1,8 @@
 package run.dn5.proxychatsync
 
 import com.charleskorn.kaml.Yaml
+import run.dn5.proxychatsync.configuration.Configuration
+import run.dn5.proxychatsync.configuration.ConfigurationLoader
 import run.dn5.proxychatsync.discord.DiscordChatSync
 import java.io.File
 import java.nio.file.Files
@@ -11,14 +13,15 @@ class Common(
 ) {
     val discordChatSync: DiscordChatSync = DiscordChatSync(this)
 
-    init {
+    fun enable() {
         checkResources()
-        if (isProxy && getConfig().discord.enable) discordChatSync.enable(getConfig().discord.token)
+        val config = getConfig()
+        if (isProxy && config.discord.enable) discordChatSync.enable(getConfig().discord.token)
     }
 
     private fun checkResources() {
         if (!dataFolder.exists()) dataFolder.mkdirs()
-        if(isProxy){
+        if (isProxy) {
             val configFile = File("${dataFolder}/config.yml")
             if (!configFile.exists()) {
                 javaClass.getResourceAsStream("/config.yml").use {
@@ -30,9 +33,6 @@ class Common(
     }
 
     fun getConfig(): Configuration {
-        return Yaml.default.decodeFromStream(
-            Configuration.serializer(),
-            File("${dataFolder}/config.yml").inputStream()
-        )
+        return ConfigurationLoader(File("${dataFolder}/config.yml")).load()
     }
 }

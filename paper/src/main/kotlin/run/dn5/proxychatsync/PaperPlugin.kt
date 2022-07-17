@@ -2,7 +2,6 @@ package run.dn5.proxychatsync
 
 import com.github.ucchyocean.lc3.LunaChatAPI
 import com.github.ucchyocean.lc3.LunaChatBukkit
-import net.luckperms.api.LuckPerms
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import run.dn5.proxychatsync.paper.PluginMessageHandler
@@ -30,8 +29,8 @@ class PaperPlugin : JavaPlugin() {
             this,
             Constants.CHANNEL_FULL,
             PluginMessageHandler(this)
-        );
-        server.messenger.registerOutgoingPluginChannel(this, Constants.CHANNEL_FULL);
+        )
+        server.messenger.registerOutgoingPluginChannel(this, Constants.CHANNEL_FULL)
         logger.info("Enabled")
     }
 

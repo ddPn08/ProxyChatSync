@@ -1,11 +1,12 @@
 package run.dn5.proxychatsync.discord
 
+import club.minnced.discord.webhook.WebhookClient
+import club.minnced.discord.webhook.WebhookClientBuilder
+import club.minnced.discord.webhook.send.WebhookMessageBuilder
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.restaction.MessageAction
 import run.dn5.proxychatsync.Common
@@ -16,55 +17,58 @@ import java.util.*
 class DiscordChatSync(
     private val common: Common
 ) {
+    lateinit var jda: JDA
     var enabled: Boolean = false
-    private var jda: JDA? = null
+    var webhook: WebhookClient? = null
 
-    fun enable(token: String){
-        jda = JDABuilder.createDefault(token).build()
-        jda!!.awaitReady()
+    fun enable(token: String) {
+        val config = common.getConfig()
+        jda = JDABuilder.createDefault(token)
+            .setActivity(Activity.listening("ProxyChatSync")).build()
+        jda.awaitReady()
+        if (config.discord.mode == "webhook") setupWebhook()
         enabled = true
     }
 
-    fun disable(){
-        if(!enabled) throw Exception("DiscordChatSync is not enabled")
-        enabled = false
-        jda!!.cancelRequests()
-        jda!!.shutdownNow()
+    private fun setupWebhook() {
+        val config = common.getConfig()
+        val channel = jda.getTextChannelById(config.discord.channelId) ?: throw Exception("Channel not found")
+
+        val wh = channel.retrieveWebhooks().complete().find { it.name == "ProxyChatSync.WebHookMode" }
+            ?: channel.createWebhook("ProxyChatSync.WebhookMode").complete()
+        webhook = WebhookClientBuilder(wh.url).build()
+
     }
 
-    fun registerEvents(listener: ListenerAdapter){
-        getClient().addEventListener(listener)
+    fun registerEvents(listener: ListenerAdapter) {
+        jda.addEventListener(listener)
     }
 
-    private fun getClient(): JDA {
-        if(jda == null) throw Exception("Discord client not enabled")
-        return jda!!
+    fun sendWebhook(message: String, username: String, uuid: String) {
+        webhook?.send(
+            WebhookMessageBuilder().setUsername(username)
+                .setAvatarUrl(common.getConfig().discord.skinImageUrl.replace("\${uuid}", uuid))
+                .setContent(message).build()
+        )
     }
 
-    fun getOwn(): User {
-        return getClient().selfUser
-    }
     fun sendMessage(message: String, channelId: String = common.getConfig().discord.channelId) {
-        val channel = getClient().getTextChannelById(channelId) ?: return
+        val channel = jda.getTextChannelById(channelId) ?: return
         channel.sendMessage(message).queue()
     }
+
     fun userAction(message: String?, uuid: UUID, color: Color?) {
-        val eb = EmbedBuilder()
         val config = common.getConfig()
-        eb.setAuthor(message, null, "https://crafatar.com/avatars/${uuid}")
-        eb.setColor(color)
-        sendEmbed(eb.build(), config.discord.channelId)
+        val channel = jda.getTextChannelById(config.discord.channelId) ?: return
+        val eb = EmbedBuilder()
+            .setAuthor(message, null, common.getConfig().discord.skinImageUrl.replace("\${uuid}", uuid.toString()))
+            .setColor(color)
+        channel.sendMessageEmbeds(eb.build()).queue()
     }
 
     fun getMessageAction(message: String): MessageAction? {
         val config = common.getConfig()
-        val channel = getClient().getTextChannelById(config.discord.channelId) ?: return null
+        val channel = jda.getTextChannelById(config.discord.channelId) ?: return null
         return channel.sendMessage(message)
     }
-
-    fun sendEmbed(embed: MessageEmbed, channelId: String) {
-        val channel = getClient().getTextChannelById(channelId) ?: return
-        channel.sendMessageEmbeds(embed).queue()
-    }
-
 }
