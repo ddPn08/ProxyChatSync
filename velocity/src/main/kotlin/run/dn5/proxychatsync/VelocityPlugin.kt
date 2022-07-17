@@ -42,7 +42,6 @@ class VelocityPlugin @Inject constructor(
     init {
         instance = this
         checkResources()
-        messenger.onStart()
     }
 
     @Subscribe
@@ -57,7 +56,10 @@ class VelocityPlugin @Inject constructor(
         registerListeners()
 
         val ds = common.discordChatSync
-        if (ds.enabled) ds.registerEvents(MessageListener(this))
+        if (ds.enabled) {
+            ds.registerEvents(MessageListener(this))
+            messenger.onStart()
+        }
     }
 
     @Subscribe
