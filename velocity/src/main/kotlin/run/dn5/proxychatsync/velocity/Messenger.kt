@@ -79,14 +79,14 @@ class Messenger(
         if (!plugin.common.discordChatSync.enabled) return
         val discord = plugin.common.discordChatSync
         val message = (
-                (if (syncData.japanized.isNotEmpty()) getMessage("Discord_FromServer") else getMessage("Discord_FromServerWithJapanese"))
+                (if (syncData.japanized.isEmpty()) getMessage("Discord_FromServer") else getMessage("Discord_FromServerWithJapanese"))
                     ?: "(\${server}) \${author} > \${message}")
             .replace("\${server}", syncData.server)
             .replace("\${author}", syncData.username.ifEmpty { "Unknown" })
             .replace("\${message}", syncData.message)
             .replace("\${japanized}", syncData.japanized)
 
-        if (discord.webhook != null) discord.sendWebhook(syncData.message, syncData.username, syncData.uuid)
+        if (discord.webhook != null) discord.sendWebhook(message, syncData.username, syncData.uuid)
         else discord.sendMessage(message)
 
     }
