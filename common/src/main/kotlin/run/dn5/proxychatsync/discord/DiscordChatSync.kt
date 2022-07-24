@@ -34,10 +34,9 @@ class DiscordChatSync(
         val config = common.getConfig()
         val channel = jda.getTextChannelById(config.discord.channelId) ?: throw Exception("Channel not found")
 
-        val wh = channel.retrieveWebhooks().complete().find { it.name == "ProxyChatSync.WebHookMode" }
+        val wh = channel.retrieveWebhooks().complete().find { it.name == "ProxyChatSync.WebhookMode" }
             ?: channel.createWebhook("ProxyChatSync.WebhookMode").complete()
         webhook = WebhookClientBuilder(wh.url).build()
-
     }
 
     fun registerEvents(listener: ListenerAdapter) {
