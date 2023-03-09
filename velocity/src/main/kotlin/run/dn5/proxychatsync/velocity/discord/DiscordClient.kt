@@ -1,4 +1,4 @@
-package run.dn5.proxychatsync.discord
+package run.dn5.proxychatsync.velocity.discord
 
 import club.minnced.discord.webhook.WebhookClient
 import club.minnced.discord.webhook.WebhookClientBuilder
@@ -7,36 +7,39 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.restaction.MessageAction
-import run.dn5.proxychatsync.Common
+import run.dn5.proxychatsync.configuration.Configuration
+import run.dn5.proxychatsync.velocity.Channel
 import java.awt.Color
 import java.util.*
 
-
-class DiscordChatSync(
-    private val common: Common
+class DiscordClient(
+    private val data: Configuration.Discord
 ) {
     lateinit var jda: JDA
-    var enabled: Boolean = false
+    private var enabled: Boolean = false
     var webhook: WebhookClient? = null
 
-    fun enable(token: String) {
-        val config = common.getConfig()
-        jda = JDABuilder.createDefault(token)
+    fun enable() {
+        jda = JDABuilder.createDefault(data.token)
             .setActivity(Activity.listening("ProxyChatSync")).build()
         jda.awaitReady()
-        if (config.discord.mode == "webhook") setupWebhook()
+        if (data.mode == "webhook") setupWebhook()
         enabled = true
     }
 
     private fun setupWebhook() {
-        val config = common.getConfig()
-        val channel = jda.getTextChannelById(config.discord.channelId) ?: throw Exception("Channel not found")
+        val channel = jda.getTextChannelById(data.channelId) ?: throw Exception("Channel not found")
 
         val wh = channel.retrieveWebhooks().complete().find { it.name == "ProxyChatSync.WebhookMode" }
             ?: channel.createWebhook("ProxyChatSync.WebhookMode").complete()
         webhook = WebhookClientBuilder(wh.url).build()
+    }
+
+    fun isEnabled(): Boolean {
+        return enabled
     }
 
     fun registerEvents(listener: ListenerAdapter) {
@@ -46,28 +49,38 @@ class DiscordChatSync(
     fun sendWebhook(message: String, username: String, uuid: String) {
         webhook?.send(
             WebhookMessageBuilder().setUsername(username)
-                .setAvatarUrl(common.getConfig().discord.skinImageUrl.replace("\${uuid}", uuid))
+                .setAvatarUrl(data.skinImageUrl.replace("\${uuid}", uuid))
                 .setContent(message).build()
         )
     }
 
-    fun sendMessage(message: String, channelId: String = common.getConfig().discord.channelId) {
+    fun sendMessage(message: String, channelId: String = data.channelId) {
         val channel = jda.getTextChannelById(channelId) ?: return
         channel.sendMessage(message).queue()
     }
 
     fun userAction(message: String?, uuid: UUID, color: Color?) {
-        val config = common.getConfig()
-        val channel = jda.getTextChannelById(config.discord.channelId) ?: return
+        val channel = jda.getTextChannelById(data.channelId) ?: return
         val eb = EmbedBuilder()
-            .setAuthor(message, null, common.getConfig().discord.skinImageUrl.replace("\${uuid}", uuid.toString()))
+            .setAuthor(message, null, data.skinImageUrl.replace("\${uuid}", uuid.toString()))
             .setColor(color)
         channel.sendMessageEmbeds(eb.build()).queue()
     }
 
     fun getMessageAction(message: String): MessageAction? {
-        val config = common.getConfig()
-        val channel = jda.getTextChannelById(config.discord.channelId) ?: return null
+        val channel = jda.getTextChannelById(data.channelId) ?: return null
         return channel.sendMessage(message)
+    }
+
+    class MessageListener(
+        private val channel: Channel,
+        private val client: DiscordClient,
+    ) : ListenerAdapter() {
+        override fun onMessageReceived(e: MessageReceivedEvent) {
+            if (e.channel.id != channel.data.discord.channelId) return
+            e.member ?: return
+            if (e.author == client.jda.selfUser) return
+            channel.chatFromDiscord(e.author, e.message)
+        }
     }
 }

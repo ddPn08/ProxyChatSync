@@ -1,19 +1,36 @@
 package run.dn5.proxychatsync.velocity
 
 import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.proxy.server.RegisteredServer
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader
 import run.dn5.proxychatsync.VelocityPlugin
+import run.dn5.proxychatsync.configuration.Configuration
 import run.dn5.proxychatsync.model.ChatSyncData
+import run.dn5.proxychatsync.velocity.discord.DiscordClient
 import java.awt.Color
 import java.io.File
 
-class Messenger(
-    private val plugin: VelocityPlugin
+class Channel(
+    private val plugin: VelocityPlugin,
+    val data: Configuration.Channel
 ) {
+
+    private val discord = DiscordClient(data.discord)
+
+    init {
+        if(data.discord.enable) {
+            discord.enable()
+            discord.registerEvents(DiscordClient.MessageListener(this, discord))
+        }
+    }
+
+
     private fun getMessage(): ConfigurationNode {
         return YAMLConfigurationLoader.builder().setFile(File("${plugin.dataFolder}/message.yml")).build().load()
     }
@@ -23,23 +40,27 @@ class Messenger(
     }
 
     private fun broadcast(msg: String) {
-        plugin.proxy.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(msg))
+        getServers().forEach { it.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(msg)) }
+    }
+
+    fun getServers(): List<RegisteredServer> {
+        return plugin.proxy.allServers.filter { data.servers.contains(it.serverInfo.name) }
     }
 
     fun onStart() {
-        if (!plugin.common.discordChatSync.enabled) return
-        plugin.common.discordChatSync.sendMessage(
+        if (discord.isEnabled()) discord.sendMessage(
             getMessage("Discord_ServerStart") ?: ":white_check_mark: **サーバーが起動しました**"
         )
     }
 
     fun onStop() {
-        if (!plugin.common.discordChatSync.enabled) return
+        if (!discord.isEnabled()) return
         try {
-            plugin.common.discordChatSync.getMessageAction(
+            discord.getMessageAction(
                 getMessage("Discord_ServerStop") ?: ":octagonal_sign: **サーバーが停止しました**"
             )?.complete()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     fun onDisconnected(player: Player) {
@@ -47,10 +68,10 @@ class Messenger(
             .replace("\${player}", player.username)
         broadcast(msg)
 
-        if (plugin.common.discordChatSync.enabled) {
+        if (discord.isEnabled()) {
             val discordMsg = (getMessage("Discord_Disconnect") ?: "\${player} がサーバーから退出しました。")
                 .replace("\${player}", player.username)
-            plugin.common.discordChatSync.userAction(discordMsg, player.uniqueId, Color.RED)
+            discord.userAction(discordMsg, player.uniqueId, Color.RED)
         }
     }
 
@@ -59,25 +80,24 @@ class Messenger(
             .replace("\${player}", player.username)
         broadcast(msg)
 
-        if (plugin.common.discordChatSync.enabled) {
+        if (discord.isEnabled()) {
             val discordMsg = (getMessage("Discord_ProxyJoin") ?: "\${player} がサーバーに参加しました。")
                 .replace("\${player}", player.username)
-            plugin.common.discordChatSync.userAction(discordMsg, player.uniqueId, Color.GREEN)
+            discord.userAction(discordMsg, player.uniqueId, Color.GREEN)
         }
     }
 
     fun onServerSwitch(player: Player, server: String) {
-        if (plugin.common.discordChatSync.enabled) {
+        if (discord.isEnabled()) {
             val discordMsg = (getMessage("Discord_ServerSwitch") ?: "\${player} が \${server} に参加しました。")
                 .replace("\${player}", player.username)
                 .replace("\${server}", server)
-            plugin.common.discordChatSync.userAction(discordMsg, player.uniqueId, Color.CYAN)
+            discord.userAction(discordMsg, player.uniqueId, Color.CYAN)
         }
     }
 
     fun chatToDiscord(syncData: ChatSyncData) {
-        if (!plugin.common.discordChatSync.enabled) return
-        val discord = plugin.common.discordChatSync
+        if (!discord.isEnabled()) return
         val message = (
                 (if (syncData.japanized.isEmpty()) getMessage("Discord_FromServer") else getMessage("Discord_FromServerWithJapanese"))
                     ?: "(\${server}) \${author} > \${message}")

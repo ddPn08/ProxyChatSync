@@ -9,8 +9,10 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
 import org.slf4j.Logger
-import run.dn5.proxychatsync.velocity.Messenger
-import run.dn5.proxychatsync.velocity.discord.listener.MessageListener
+import run.dn5.proxychatsync.configuration.Configuration
+import run.dn5.proxychatsync.configuration.ConfigurationLoader
+import run.dn5.proxychatsync.velocity.Channel
+import run.dn5.proxychatsync.velocity.ChannelManager
 import run.dn5.proxychatsync.velocity.listener.DisconnectListener
 import run.dn5.proxychatsync.velocity.listener.PluginMessageListener
 import run.dn5.proxychatsync.velocity.listener.PostLoginListener
@@ -32,8 +34,10 @@ class VelocityPlugin @Inject constructor(
     val dataFolder: Path
 ) {
 
-    val common = Common(dataFolder.toFile(), true)
-    val messenger = Messenger(this)
+    //    val common = Common(dataFolder.toFile(), true)
+//    val messenger = Channel(this)
+    private lateinit var config: Configuration
+    val channelManger = ChannelManager(this)
 
     companion object {
         lateinit var instance: VelocityPlugin
@@ -52,28 +56,41 @@ class VelocityPlugin @Inject constructor(
                 Constants.CHANNEL_NAME
             )
         )
-        common.enable()
+        
+        loadConfig()
+//        common.enable()
         registerListeners()
+        channelManger.setup()
+        channelManger.onStart()
 
-        val ds = common.discordChatSync
-        if (ds.enabled) {
-            ds.registerEvents(MessageListener(this))
-            messenger.onStart()
-        }
+//        val ds = common.discordChatSync
+//        if (ds.enabled) {
+//            ds.registerEvents(MessageListener(this))
+//            messenger.onStart()
+//        }
     }
 
     @Subscribe
     fun onDisable(e: ProxyShutdownEvent) {
-        messenger.onStop()
+        channelManger.onStop()
     }
 
     private fun checkResources() {
         if (!dataFolder.toFile().exists()) dataFolder.toFile().mkdir()
         val file = File("${dataFolder}/message.yml")
         if (!file.exists()) javaClass.getResourceAsStream("/velocity.message.yml").use { input ->
-            if (input == null) return
-            Files.copy(input, file.toPath())
+            if (input != null) Files.copy(input, file.toPath())
         }
+        val configFile = File("${dataFolder}/config.yml")
+        if (!configFile.exists()) javaClass.getResourceAsStream("/config.yml").use {
+            if (it != null) Files.copy(it, configFile.toPath())
+        }
+    }
+
+    private fun loadConfig() {
+        val configFile = File("${dataFolder}/config.yml")
+        val loader = ConfigurationLoader(configFile)
+        config = loader.load()
     }
 
     private fun registerListeners() {
@@ -82,5 +99,9 @@ class VelocityPlugin @Inject constructor(
             PostLoginListener(this),
             DisconnectListener(this)
         ).forEach { proxy.eventManager.register(this, it) }
+    }
+
+    fun getConfig(): Configuration {
+        return config
     }
 }

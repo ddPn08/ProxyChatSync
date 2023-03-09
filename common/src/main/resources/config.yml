@@ -1,20 +1,18 @@
-#
-# Discordサーバーとチャットを同期する場合には以下の項目を編集してください。
-# Edit the following items to synchronize chat with Discord server.
-#
-discord:
-  # Discordとチャットを同期するかどうか。
-  # Whether to sync chat with Discord
-  enable: false
-  # Discord Bot の token
-  # Token of Discord Bot
-  token: ''
-  # 同期するチャンネルのID
-  # ID of channels to sync
-  channelId: '000000000000000000'
-  # 同期モード
-  # Sync mode
-  mode: 'bot' # "bot" or "webhook"
-  # スキンAPIのURL
-  # URL of SkinAPI
-  skinApiUrl: '"https://crafatar.com/avatars/${uuid}"'
+channels:
+  - discord:
+      # Discordとチャットを同期するかどうか。
+      # Whether to sync chat with Discord
+      enable: false
+      # Discord Bot の token
+      # Token of Discord Bot
+      token: ''
+      # 同期するチャンネルのID
+      # ID of channels to sync
+      channelId: '000000000000000000'
+      # 同期モード
+      # Sync mode
+      mode: 'bot' # "bot" or "webhook"
+      # スキンAPIのURL
+      # URL of SkinAPI
+      skinApiUrl: '"https://crafatar.com/avatars/${uuid}"'
+    servers: [ server1, server2 ]

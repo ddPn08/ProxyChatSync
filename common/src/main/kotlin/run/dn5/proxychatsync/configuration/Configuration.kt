@@ -4,8 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Configuration(
-    var discord: Discord = Discord(),
+    var channels: List<Channel>
 ) {
+    @Serializable
+    data class Channel(
+        var discord: Discord,
+        var servers: List<String>
+    )
+
     @Serializable
     data class Discord(
         var enable: Boolean = false,

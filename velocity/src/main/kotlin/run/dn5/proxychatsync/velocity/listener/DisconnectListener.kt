@@ -9,6 +9,9 @@ class DisconnectListener(
 ) {
     @Subscribe
     fun onDisconnect(e: DisconnectEvent) {
-        plugin.messenger.onDisconnected(e.player)
+        e.player.currentServer.ifPresent { server ->
+            val channels = plugin.channelManger.getChannels(server.serverInfo.name)
+            channels.forEach { it.onDisconnected(e.player) }
+        }
     }
 }

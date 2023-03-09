@@ -8,7 +8,10 @@ class PostLoginListener(
     private val plugin: VelocityPlugin
 ) {
     @Subscribe
-    fun onPostLogin(e: PostLoginEvent){
-        plugin.messenger.onLogin(e.player)
+    fun onPostLogin(e: PostLoginEvent) {
+        e.player.currentServer.ifPresent { server ->
+            val channels = plugin.channelManger.getChannels(server.serverInfo.name)
+            channels.forEach { it.onLogin(e.player) }
+        }
     }
 }

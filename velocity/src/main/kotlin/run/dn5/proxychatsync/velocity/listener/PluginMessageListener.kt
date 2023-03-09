@@ -12,6 +12,7 @@ import run.dn5.proxychatsync.Constants
 import run.dn5.proxychatsync.VelocityPlugin
 import run.dn5.proxychatsync.model.ChatSyncData
 import run.dn5.proxychatsync.model.ServerSwitchData
+import run.dn5.proxychatsync.velocity.ChannelSet
 
 class PluginMessageListener(
     private val plugin: VelocityPlugin
@@ -21,16 +22,17 @@ class PluginMessageListener(
         val input = ByteStreams.newDataInput(e.data)
         val sub = input.readUTF()
         val connection = e.source as ServerConnection
+        val channels = plugin.channelManger.getChannels(connection.serverInfo.name)
 
         when (sub) {
-            Constants.SUBS2P.CHAT_SYNC.channel -> chatSync(input, connection)
-            Constants.SUBS2P.PLAYER_JOIN.channel -> playerJoin(connection)
-            Constants.SUBS2P.VANISH_PLAYER_HIDE.channel -> vanishPlayerHide(connection)
-            Constants.SUBS2P.VANISH_PLAYER_SHOW.channel -> vanishPlayerShow(connection)
+            Constants.SUBS2P.CHAT_SYNC.channel -> chatSync(input, connection, channels)
+            Constants.SUBS2P.PLAYER_JOIN.channel -> playerJoin(connection, channels)
+            Constants.SUBS2P.VANISH_PLAYER_HIDE.channel -> vanishPlayerHide(connection, channels)
+            Constants.SUBS2P.VANISH_PLAYER_SHOW.channel -> vanishPlayerShow(connection, channels)
         }
     }
 
-    private fun chatSync(input: ByteArrayDataInput, connection: ServerConnection) {
+    private fun chatSync(input: ByteArrayDataInput, connection: ServerConnection, channels: ChannelSet) {
         val gson = GsonBuilder().serializeNulls().create()
         val data = input.readUTF()
         val syncData = gson.fromJson(data, ChatSyncData::class.java)
@@ -39,18 +41,26 @@ class PluginMessageListener(
         val out = ByteStreams.newDataOutput()
         out.writeUTF(Constants.SUBP2S.CHAT_SYNC.channel)
         out.writeUTF(gson.toJson(syncData))
-        plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() && it.serverInfo != connection.serverInfo }
-            .forEach {
-                it.sendPluginMessage(
-                    MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME),
-                    out.toByteArray()
-                )
-            }
 
-        plugin.messenger.chatToDiscord(syncData)
+//        plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() && it.serverInfo != connection.serverInfo }
+//            .forEach {
+//                it.sendPluginMessage(
+//                    MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME),
+//                    out.toByteArray()
+//                )
+//            }
+
+        channels.forEachServer { server ->
+            if (server.playersConnected.isNotEmpty() && server.serverInfo != connection.serverInfo) server.sendPluginMessage(
+                MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME),
+                out.toByteArray()
+            )
+
+        }
+        channels.forEach { it.chatToDiscord(syncData) }
     }
 
-    private fun playerJoin(connection: ServerConnection) {
+    private fun playerJoin(connection: ServerConnection, channels: ChannelSet) {
         val player = connection.player
 
         val out = ByteStreams.newDataOutput()
@@ -65,25 +75,23 @@ class PluginMessageListener(
             )
         )
 
-        plugin.proxy.allServers.filter { it.playersConnected.isNotEmpty() }.forEach {
-            it.sendPluginMessage(
+        channels.forEachServer {
+            if (it.playersConnected.isNotEmpty()) it.sendPluginMessage(
                 MinecraftChannelIdentifier.create(Constants.CHANNEL_ID, Constants.CHANNEL_NAME),
                 out.toByteArray()
             )
         }
-
-        plugin.messenger.onServerSwitch(player, connection.serverInfo.name)
+        channels.forEach { it.onServerSwitch(player, connection.serverInfo.name) }
     }
 
-    private fun vanishPlayerHide(connection: ServerConnection) {
-        plugin.messenger.onDisconnected(connection.player)
+    private fun vanishPlayerHide(connection: ServerConnection, channels: ChannelSet) {
+        channels.forEach { it.onDisconnected(connection.player) }
     }
 
-    private fun vanishPlayerShow(connection: ServerConnection) {
+    private fun vanishPlayerShow(connection: ServerConnection, channels: ChannelSet) {
         val player = connection.player
-        plugin.messenger.onLogin(player)
-
-        playerJoin(connection)
+        channels.forEach { it.onLogin(player) }
+        playerJoin(connection, channels)
     }
 
 
