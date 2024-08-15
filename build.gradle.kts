@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version("1.6.0")
+    kotlin("jvm") version("1.9.21")
     id("com.github.johnrengelman.shadow") version "7.1.1"
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.3"
 }
