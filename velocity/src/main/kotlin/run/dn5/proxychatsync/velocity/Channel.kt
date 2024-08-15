@@ -24,7 +24,7 @@ class Channel(
     private val discord = DiscordClient(data.discord)
 
     init {
-        if(data.discord.enable) {
+        if (data.discord.enable) {
             discord.enable()
             discord.registerEvents(DiscordClient.MessageListener(this, discord))
         }
@@ -114,6 +114,6 @@ class Channel(
     fun chatFromDiscord(author: User, message: Message) {
         val text = (getMessage("Discord_FromDiscord") ?: "[ &bDISCORD &r] \${author} &r> \${message}")
             .replace("\${author}", author.name).replace("\${message}", message.contentDisplay)
-        plugin.proxy.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text))
+        getServers().forEach { it.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text)) }
     }
 }
