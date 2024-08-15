@@ -14,5 +14,5 @@ channels:
       mode: 'bot' # "bot" or "webhook"
       # スキンAPIのURL
       # URL of SkinAPI
-      skinApiUrl: '"https://crafatar.com/avatars/${uuid}"'
+      skinImageUrl: '"https://crafatar.com/avatars/${uuid}"'
     servers: [ server1, server2 ]
